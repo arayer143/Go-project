@@ -15,30 +15,29 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	viper.SetConfigFile(".env")
-	viper.AutomaticEnv()
+	// Get the current working directory
+	workDir, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get working directory: %v", err)
+	}
 
+	// Configure Viper
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
+	viper.AddConfigPath(workDir) // Look in current directory
+	viper.AddConfigPath(".")     // Also look in root directory
+	viper.AutomaticEnv()         // Read environment variables
+
+	// Read the config file
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found
-			fmt.Printf("Config file not found. Current working directory: %s\n", getCurrentDirectory())
-		}
-		return nil, err
+		return nil, fmt.Errorf("failed to read config file: %v", err)
 	}
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal config: %v", err)
 	}
 
 	return &config, nil
-}
-
-func getCurrentDirectory() string {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "Unable to get current directory"
-	}
-	return dir
 }
 

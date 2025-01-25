@@ -19,8 +19,8 @@ func Start(cfg *config.Config) {
 
 	// Routes
 	r.HandleFunc("/products", handlers.GetProducts).Methods("GET")
-	r.HandleFunc("/products/{id}", handlers.GetProduct).Methods("GET")
 	r.HandleFunc("/products", handlers.CreateProduct).Methods("POST")
+	r.HandleFunc("/products/{id}", handlers.GetProduct).Methods("GET")
 	r.HandleFunc("/products/{id}", handlers.UpdateProduct).Methods("PUT")
 	r.HandleFunc("/products/{id}", handlers.DeleteProduct).Methods("DELETE")
 

@@ -2,7 +2,10 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -10,6 +13,11 @@ import (
 )
 
 func TestDatabaseConnection(t *testing.T) {
+	// Move up to the root directory where .env is located
+	if err := moveToRootDir(); err != nil {
+		t.Fatalf("Failed to move to root directory: %v", err)
+	}
+
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
@@ -35,3 +43,18 @@ func TestDatabaseConnection(t *testing.T) {
 	log.Println("Successfully connected to the database")
 }
 
+func moveToRootDir() error {
+	// Keep moving up until we find the go.mod file
+	for {
+		if _, err := os.Stat("go.mod"); err == nil {
+			return nil
+		}
+		if err := os.Chdir(".."); err != nil {
+			return err
+		}
+		// Prevent infinite loop
+		if wd, _ := os.Getwd(); wd == filepath.Dir(wd) {
+			return fmt.Errorf("reached root directory without finding go.mod")
+		}
+	}
+}
