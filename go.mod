@@ -1,3 +1,3 @@
-module product-inventory
+module go-project
 
 go 1.23.5
